@@ -51,28 +51,14 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/",
       icon: SquareTerminal,
       isActive: true,
     },
     {
       title: "Games",
-      url: "#",
+      url: "/games",
       icon: Gamepad2,
-      items: [
-        {
-          title: "All Games",
-          url: "#",
-        },
-        {
-          title: "Add New Game",
-          url: "#",
-        },
-        {
-          title: "Game Categories",
-          url: "#",
-        },
-      ],
     },
     {
       title: "Revenue",
