@@ -1,7 +1,4 @@
-import LandingPage from './pages/landing-page'
-import ContactPage from './pages/contact-page'
-import PricingPage from './pages/pricing-page'
-import GamesPage from './pages/games-page'
+import Dashboard from "./pages/dashboard";
 import {
   BrowserRouter as Router,
   Routes,
@@ -15,10 +12,8 @@ function App() {
     <>
     <Router>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/pricing" element={<PricingPage />} />
-        <Route path="/games" element={<GamesPage />} />
+        <Route path="/" element={<Dashboard />} />
+   
       </Routes>
     </Router>
 

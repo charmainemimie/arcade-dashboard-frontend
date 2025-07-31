@@ -1,9 +1,9 @@
 
-# 🎮 Miracle Arcade Frontend
+# 🎮 Miracle Arcade Dashboard Frontend
 
 ---
 
- Welcome to the **Miracle Arcade** frontend, a project born from my deep passion to bring joy, fun, and technology to my hometown, **Chivhu**. This lively town is full of **jovial kids, energetic teens, and fun-loving adults**, all of whom deserve a space to laugh, compete, and connect. Built with **React**, **TypeScript**, **TailwindCSS**, **Shadcn**, and **Vite**, this modern web interface lays the foundation for a future gaming arcade where the community can explore exciting games, reserve play sessions, and stay updated on events and location details. This is more than just code, it's a dream in the making for Chivhu.
+ Welcome to the **Miracle Arcade Dashboard** frontend, a project born from my deep passion to bring joy, fun, and technology to my hometown, **Chivhu**. This lively town is full of **jovial kids, energetic teens, and fun-loving adults**, all of whom deserve a space to laugh, compete, and connect. Built with **React**, **TypeScript**, **TailwindCSS**, **Shadcn**, and **Vite**.
 
 
 ---
@@ -35,7 +35,7 @@
 ## 🧰 Project Setup
 
    ```bash
-   git clone https://github.com/charmainemimie/arcade-frontend.git
-   cd arcade-frontend
+   git clone https://github.com/charmainemimie/arcade-dashboard-frontend.git
+   cd arcade-dashboard-frontend
    npm install
    npm run dev
