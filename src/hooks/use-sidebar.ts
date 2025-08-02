@@ -21,4 +21,4 @@ export function useSidebar() {
   return context;
 }
 
-export { SidebarContext }; 
+export { SidebarContext };
