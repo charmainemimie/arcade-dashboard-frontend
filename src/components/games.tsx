@@ -1,26 +1,73 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Plus, Trash2, Edit } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Trash2, Edit } from "lucide-react";
 
 const initialGames = [
-  { id: 1, name: "Street Fighter VI", category: "Fighting", status: "Active", price: "$2.00" },
-  { id: 2, name: "Pac-Man", category: "Classic", status: "Active", price: "$1.50" },
-  { id: 3, name: "Tekken 8", category: "Fighting", status: "Active", price: "$2.50" },
-  { id: 4, name: "Galaga", category: "Classic", status: "Maintenance", price: "$1.50" },
-  { id: 5, name: "Mortal Kombat", category: "Fighting", status: "Active", price: "$2.00" },
-]
+  {
+    id: 1,
+    name: "Street Fighter VI",
+    category: "Fighting",
+    status: "Active",
+    price: "$2.00",
+    img: "placeholder.jpg",
+  },
+  {
+    id: 2,
+    name: "Pac-Man",
+    category: "Classic",
+    status: "Active",
+    price: "$1.50",
+    img: "placeholder.jpg",
+  },
+  {
+    id: 3,
+    name: "Tekken 8",
+    category: "Fighting",
+    status: "Active",
+    price: "$2.50",
+    img: "placeholder.jpg",
+  },
+  {
+    id: 4,
+    name: "Galaga",
+    category: "Classic",
+    status: "Maintenance",
+    price: "$1.50",
+    img: "placeholder.jpg",
+  },
+  {
+    id: 5,
+    name: "Mortal Kombat",
+    category: "Fighting",
+    status: "Active",
+    price: "$2.00",
+    img: "placeholder.jpg",
+  },
+];
 
 export function Games() {
-  const [games, setGames] = useState(initialGames)
-  const [showAddForm, setShowAddForm] = useState(false)
-  const [newGame, setNewGame] = useState({ name: "", category: "", price: "" })
+  const [games, setGames] = useState(initialGames);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newGame, setNewGame] = useState({
+    name: "",
+    category: "",
+    price: "",
+    img: "",
+  });
 
   const handleAddGame = () => {
     if (newGame.name && newGame.category && newGame.price) {
@@ -30,16 +77,17 @@ export function Games() {
         category: newGame.category,
         status: "Active",
         price: newGame.price,
-      }
-      setGames([...games, game])
-      setNewGame({ name: "", category: "", price: "" })
-      setShowAddForm(false)
+        img: newGame.img,
+      };
+      setGames([...games, game]);
+      setNewGame({ name: "", category: "", price: "", img: "" });
+      setShowAddForm(false);
     }
-  }
+  };
 
   const handleDeleteGame = (id: number) => {
-    setGames(games.filter((game) => game.id !== id))
-  }
+    setGames(games.filter((game) => game.id !== id));
+  };
 
   return (
     <div className="space-y-6">
@@ -63,7 +111,9 @@ export function Games() {
                 <Input
                   id="name"
                   value={newGame.name}
-                  onChange={(e) => setNewGame({ ...newGame, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewGame({ ...newGame, name: e.target.value })
+                  }
                   placeholder="Enter game name"
                 />
               </div>
@@ -72,7 +122,9 @@ export function Games() {
                 <Input
                   id="category"
                   value={newGame.category}
-                  onChange={(e) => setNewGame({ ...newGame, category: e.target.value })}
+                  onChange={(e) =>
+                    setNewGame({ ...newGame, category: e.target.value })
+                  }
                   placeholder="e.g., Fighting, Classic"
                 />
               </div>
@@ -81,8 +133,23 @@ export function Games() {
                 <Input
                   id="price"
                   value={newGame.price}
-                  onChange={(e) => setNewGame({ ...newGame, price: e.target.value })}
+                  onChange={(e) =>
+                    setNewGame({ ...newGame, price: e.target.value })
+                  }
                   placeholder="e.g., $2.00"
+                />
+              </div>
+              <div>
+                <Label htmlFor="img">Image</Label>
+                <Input
+                  type="file"
+                  id="img"
+                  accept="image/*"
+                  value={newGame.img}
+                  onChange={(e) =>
+                    setNewGame({ ...newGame, img: e.target.value })
+                  }
+                  placeholder="Choose game image"
                 />
               </div>
             </div>
@@ -108,6 +175,7 @@ export function Games() {
                 <TableHead>Category</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Price</TableHead>
+                <TableHead>Image</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -117,15 +185,34 @@ export function Games() {
                   <TableCell className="font-medium">{game.name}</TableCell>
                   <TableCell>{game.category}</TableCell>
                   <TableCell>
-                    <Badge variant={game.status === "Active" ? "default" : "secondary"}>{game.status}</Badge>
+                    <Badge
+                      variant={
+                        game.status === "Active" ? "default" : "secondary"
+                      }
+                    >
+                      {game.status}
+                    </Badge>
                   </TableCell>
                   <TableCell>{game.price}</TableCell>
+                  <TableCell>
+                    <img
+                      src={game.img}
+                      alt={game.name}
+                      width={100}
+                      height={100}
+                      className="rounded"
+                    />
+                  </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm">
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleDeleteGame(game.id)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteGame(game.id)}
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -137,5 +224,5 @@ export function Games() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
