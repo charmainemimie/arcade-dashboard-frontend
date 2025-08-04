@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
+import GameForm from "./add-game-form";
 import {
   Table,
   TableBody,
@@ -13,80 +13,93 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Edit } from "lucide-react";
-
-const initialGames = [
-  {
-    id: 1,
-    name: "Street Fighter VI",
-    category: "Fighting",
-    status: "Active",
-    price: "$2.00",
-    img: "placeholder.jpg",
-  },
-  {
-    id: 2,
-    name: "Pac-Man",
-    category: "Classic",
-    status: "Active",
-    price: "$1.50",
-    img: "placeholder.jpg",
-  },
-  {
-    id: 3,
-    name: "Tekken 8",
-    category: "Fighting",
-    status: "Active",
-    price: "$2.50",
-    img: "placeholder.jpg",
-  },
-  {
-    id: 4,
-    name: "Galaga",
-    category: "Classic",
-    status: "Maintenance",
-    price: "$1.50",
-    img: "placeholder.jpg",
-  },
-  {
-    id: 5,
-    name: "Mortal Kombat",
-    category: "Fighting",
-    status: "Active",
-    price: "$2.00",
-    img: "placeholder.jpg",
-  },
-];
+import { apiService, type Game, type CreateGameData } from "@/services/api";
 
 export function Games() {
-  const [games, setGames] = useState(initialGames);
+  const [games, setGames] = useState<Game[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newGame, setNewGame] = useState({
+  const [newGame, setNewGame] = useState<CreateGameData>({
     name: "",
     category: "",
+    description: "",
+    rating: 0,
+    status: "",
     price: "",
-    img: "",
+    image: "",
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const handleAddGame = () => {
-    if (newGame.name && newGame.category && newGame.price) {
-      const game = {
-        id: games.length + 1,
-        name: newGame.name,
-        category: newGame.category,
-        status: "Active",
-        price: newGame.price,
-        img: newGame.img,
-      };
-      setGames([...games, game]);
-      setNewGame({ name: "", category: "", price: "", img: "" });
-      setShowAddForm(false);
+  // Load games from API
+  useEffect(() => {
+    loadGames();
+  }, []);
+
+  const loadGames = async () => {
+    try {
+      setLoading(true);
+      const gamesData = await apiService.getGames();
+      setGames(gamesData);
+      setError(null);
+    } catch (err) {
+      setError("Failed to load games");
+      console.error("Error loading games:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleDeleteGame = (id: number) => {
-    setGames(games.filter((game) => game.id !== id));
+  const handleAddGame = async () => {
+    if (newGame.name && newGame.category && newGame.price) {
+      try {
+        let imageUrl = newGame.image;
+
+        // Upload image if file is selected
+        if (selectedFile) {
+          const uploadResult = await apiService.uploadImage(selectedFile);
+          imageUrl = uploadResult.url;
+        }
+
+        const gameData: CreateGameData = {
+          name: newGame.name,
+          description: newGame.description,
+          image: imageUrl,
+          price: newGame.price,
+          category: newGame.category,
+          rating: newGame.rating,
+          status: newGame.status,
+        };
+
+        const createdGame = await apiService.createGame(gameData);
+        setGames([...games, createdGame]);
+        setNewGame({
+          name: "",
+          category: "",
+          price: "",
+          image: "",
+          description: "",
+          rating: 0,
+          status: "",
+        });
+        setSelectedFile(null);
+        setShowAddForm(false);
+      } catch (err) {
+        setError("Failed to add game");
+        console.error("Error adding game:", err);
+      }
+    }
+  };
+
+  const handleDeleteGame = async (id: number) => {
+    try {
+      await apiService.deleteGame(id);
+      setGames(games.filter((game) => game.id !== id));
+    } catch (err) {
+      setError("Failed to delete game");
+      console.error("Error deleting game:", err);
+    }
   };
 
   return (
@@ -99,68 +112,24 @@ export function Games() {
         </Button>
       </div>
 
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      )}
+
+      {loading && (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2">Loading games...</p>
+        </div>
+      )}
+
       {showAddForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Add New Game</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="name">Game Name</Label>
-                <Input
-                  id="name"
-                  value={newGame.name}
-                  onChange={(e) =>
-                    setNewGame({ ...newGame, name: e.target.value })
-                  }
-                  placeholder="Enter game name"
-                />
-              </div>
-              <div>
-                <Label htmlFor="category">Category</Label>
-                <Input
-                  id="category"
-                  value={newGame.category}
-                  onChange={(e) =>
-                    setNewGame({ ...newGame, category: e.target.value })
-                  }
-                  placeholder="e.g., Fighting, Classic"
-                />
-              </div>
-              <div>
-                <Label htmlFor="price">Price per Play</Label>
-                <Input
-                  id="price"
-                  value={newGame.price}
-                  onChange={(e) =>
-                    setNewGame({ ...newGame, price: e.target.value })
-                  }
-                  placeholder="e.g., $2.00"
-                />
-              </div>
-              <div>
-                <Label htmlFor="img">Image</Label>
-                <Input
-                  type="file"
-                  id="img"
-                  accept="image/*"
-                  value={newGame.img}
-                  onChange={(e) =>
-                    setNewGame({ ...newGame, img: e.target.value })
-                  }
-                  placeholder="Choose game image"
-                />
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Button onClick={handleAddGame}>Add Game</Button>
-              <Button variant="outline" onClick={() => setShowAddForm(false)}>
-                Cancel
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <GameForm
+          handleAddGame={handleAddGame}
+          setShowAddForm={setShowAddForm}
+        />
       )}
 
       <Card>
@@ -185,18 +154,14 @@ export function Games() {
                   <TableCell className="font-medium">{game.name}</TableCell>
                   <TableCell>{game.category}</TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        game.status === "Active" ? "default" : "secondary"
-                      }
-                    >
+
                       {game.status}
-                    </Badge>
+                  
                   </TableCell>
                   <TableCell>{game.price}</TableCell>
                   <TableCell>
                     <img
-                      src={game.img}
+                      src={game.image}
                       alt={game.name}
                       width={100}
                       height={100}
