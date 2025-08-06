@@ -5,12 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
-const backendURL = import.meta.env.ONLINE_API_URL;
+const backendURL = import.meta.env.VITE_ONLINE_API_URL || import.meta.env.VITE_LOCAL_API_URL;
 
 export const GameForm = ({
   setShowAddForm,
 }: {
-  handleAddGame: () => void;
+  
+  handleAddGame?: () => void; // Made optional as it wasn't being used
   setShowAddForm: (show: boolean) => void;
 }) => {
   const [gameData, setGameData] = useState({
@@ -19,7 +20,8 @@ export const GameForm = ({
     price: "",
     category: "",
     status: "",
-    rating: "",
+    image: "",
+    rating: 0,
   });
   const [image, setImage] = useState<File | null>(null);
 
@@ -28,23 +30,64 @@ export const GameForm = ({
   };
 
   const handleSubmit = async () => {
-    const formData = new FormData();
-    for (const key in gameData) {
-      formData.append(key, gameData[key as keyof typeof gameData]);
-    }
-    if (image) {
-      formData.append("image", image);
+    try {
+        let imageUrl = "";
+
+        if (image) {
+            imageUrl = await uploadImageToCloudinary(image);
+        } else {
+            // Handle case where no image is selected,
+            // or simply return early if an image is required.
+            alert("Please select an image file.");
+            return;
+        }
+
+        // Add a check for other required fields before posting
+        if (!gameData.name || !gameData.price || !gameData.category || !gameData.status || !imageUrl) {
+            alert("Please fill in all required fields.");
+            return;
+        }
+        console.log("Sending to backend:", {
+          ...gameData,
+          image: imageUrl,
+        });
+
+        const res = await axios.post(`${backendURL}/games`, {
+            ...gameData,
+            image: imageUrl,
+        });
+
+        console.log("Game uploaded:", res.data);
+        setShowAddForm(false);
+      }catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error("Error:", err.message);
+        } else {
+          console.error("Unknown error:", err);
+        }
+      
+      
     }
 
-    try {
-      const res = await axios.post(`${backendURL}/games`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }, 
-      });
-      console.log("Game uploaded:", res.data);
-      setShowAddForm(false);
-    } catch (err) {
-      console.error("Upload failed:", err);
+};
+
+
+  const uploadImageToCloudinary = async (image: File) => {
+    const formData = new FormData();
+    formData.append("file", image);
+    formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
     }
+    
+
+    const CLOUDNAME = import.meta.env.VITE_CLOUD_NAME;
+    const res = await axios.post(
+      `https://api.cloudinary.com/v1_1/${CLOUDNAME}/image/upload`,
+      formData
+    );
+
+    return res.data.secure_url;
   };
 
   return (
@@ -80,11 +123,35 @@ export const GameForm = ({
             <Label htmlFor="price">Price per Play</Label>
             <Input
               id="price"
+              type="number" // Changed to number for price
               value={gameData.price}
               onChange={(e) =>
                 setGameData({ ...gameData, price: e.target.value })
               }
               placeholder="e.g., $2.00"
+            />
+          </div>
+          <div>
+            <Label htmlFor="status">Status</Label>
+            <Input
+              id="status"
+              value={gameData.status}
+              onChange={(e) =>
+                setGameData({ ...gameData, status: e.target.value })
+              }
+              placeholder="e.g., Available, Coming Soon"
+            />
+          </div>
+          <div>
+            <Label htmlFor="rating">Rating</Label>
+            <Input
+              id="rating"
+              type="number" // Changed to number for rating
+              value={gameData.rating}
+              onChange={(e) =>
+                setGameData({ ...gameData, rating: Number(e.target.value) })
+              }
+              placeholder="e.g., 4.5"
             />
           </div>
           <div>
@@ -94,7 +161,17 @@ export const GameForm = ({
               id="img"
               accept="image/*"
               onChange={handleImageChange}
-              placeholder="Choose game image"
+            />
+          </div>
+          <div className="col-span-1 md:col-span-3">
+            <Label htmlFor="description">Description</Label>
+            <Input // Using Input for simplicity, you could use a textarea
+              id="description"
+              value={gameData.description}
+              onChange={(e) =>
+                setGameData({ ...gameData, description: e.target.value })
+              }
+              placeholder="Enter a brief description of the game"
             />
           </div>
         </div>
