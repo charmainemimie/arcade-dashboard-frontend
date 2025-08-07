@@ -21,6 +21,7 @@ export function Games() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  
   const [newGame, setNewGame] = useState<CreateGameData>({
     name: "",
     category: "",
@@ -92,10 +93,11 @@ export function Games() {
     }
   };
 
-  const handleDeleteGame = async (id: number) => {
+  const handleDeleteGame = async (_id: number) => {
     try {
-      await apiService.deleteGame(id);
-      setGames(games.filter((game) => game.id !== id));
+      await apiService.deleteGame(_id);
+      setGames(games.filter((game) => game._id !== _id));
+      alert("Game deleted successfully");
     } catch (err) {
       setError("Failed to delete game");
       console.error("Error deleting game:", err);
@@ -150,7 +152,7 @@ export function Games() {
             </TableHeader>
             <TableBody>
               {games.map((game) => (
-                <TableRow key={game.id}>
+                <TableRow key={game._id}>
                   <TableCell className="font-medium">{game.name}</TableCell>
                   <TableCell>{game.category}</TableCell>
                   <TableCell>
@@ -176,7 +178,7 @@ export function Games() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleDeleteGame(game.id)}
+                        onClick={() => handleDeleteGame(game._id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

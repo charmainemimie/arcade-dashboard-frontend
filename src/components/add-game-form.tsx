@@ -56,7 +56,7 @@ export const GameForm = ({
             ...gameData,
             image: imageUrl,
         });
-
+        alert("Game added successfully");
         console.log("Game uploaded:", res.data);
         setShowAddForm(false);
       }catch (err: unknown) {

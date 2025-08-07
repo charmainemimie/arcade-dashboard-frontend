@@ -3,7 +3,7 @@ const API_BASE_URL =
   import.meta.env.VITE_LOCAL_API_URL
 
 export interface Game {
-  id: number;
+  _id: number;
   name: string;
   category: string;
   status: string;
@@ -79,8 +79,8 @@ class ApiService {
     });
   }
 
-  async deleteGame(id: number): Promise<void> {
-    return this.request<void>(`/games/${id}`, {
+  async deleteGame(_id: number): Promise<void> {
+    return this.request<void>(`/games/${_id}`, {
       method: "DELETE",
     });
   }
